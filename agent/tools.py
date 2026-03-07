@@ -7,7 +7,7 @@ from langchain_core.tools import tool
 PROJECT_ROOT = pathlib.Path.cwd()/ "generated_projects" # this tell the generated projects' root directory.
 
 def safe_path_for_projects(path: str) -> pathlib.Path:
-    p = (PROJECT_ROOT / path).resolve()
+    p = (PROJECT_ROOT / path).resolve() # this gives a unified combined line.
     if PROJECT_ROOT.resolve() not in p.parents and PROJECT_ROOT.resolve() != p.parent and PROJECT_ROOT.resolve() != p:
         raise ValueError("Attempt to write outside project root")
     return p # If the path is safe, return the validated absolute path.
@@ -41,7 +41,7 @@ def get_current_directory() -> str:
 @tool
 def list_files(directory: str = ".") -> str:
     """Lists all files in the specified directory within the project root."""
-    p = safe_path_for_projects((directory))
+    p = safe_path_for_projects(directory)
     if not p.is_dir():
         return f"ERROR: {p} is not a directory"
     files = [str(f.relative_to(PROJECT_ROOT)) for f in p.glob("**/*") if f.is_file()]
