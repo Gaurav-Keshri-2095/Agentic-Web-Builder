@@ -38,14 +38,21 @@ def get_current_directory() -> str:
     return str(PROJECT_ROOT)
 
 
+# @tool
+# def list_files(directory: str = ".") -> str:
+#     """Lists all files in the specified directory within the project root."""
+#     p = safe_path_for_projects(directory)
+#     if not p.is_dir():
+#         return f"ERROR: {p} is not a directory"
+#     files = [str(f.relative_to(PROJECT_ROOT)) for f in p.glob("**/*") if f.is_file()]
+#     return "\n".join(files) if files else "No files found"
+
 @tool
-def list_files(directory: str = ".") -> str:
-    """Lists all files in the specified directory within the project root."""
-    p = safe_path_for_projects(directory)
-    if not p.is_dir():
-        return f"ERROR: {p} is not a directory"
-    files = [str(f.relative_to(PROJECT_ROOT)) for f in p.glob("**/*") if f.is_file()]
-    return "\n".join(files) if files else "No files found"
+def list_files() -> str: # Remove the 'directory' argument entirely
+    """Lists all files in the current working directory."""
+    import os
+    files = os.listdir('.')
+    return "\n".join(files)
 
 
 @tool

@@ -3,12 +3,11 @@ name = "agentic-web-builder"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.14"
-dependencies = ["groq>=0.31.0",
-    "langchain>=0.3.27",
-    "langchain-core>=0.3.72",
-    "langchain-groq>=0.3.7",
-    "langgraph>=0.6.3",
-    "pip>=25.2",
-    "pydantic>=2.11.7",
-    "python-dotenv>=1.1.1",]
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "langchain>=1.2.0",
+    "langchain-core>=1.2.0",
+    "langchain-groq>=1.1.0",
+    "langgraph>=1.1.0",
+    "python-dotenv>=1.0.0"
+]
