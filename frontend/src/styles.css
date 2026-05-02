@@ -1,0 +1,138 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-glow: var(--primary-glow);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+}
+
+/* Dark-first design — single theme */
+:root {
+  --radius: 0.625rem;
+
+  --background: oklch(0.16 0.012 260);
+  --foreground: oklch(0.96 0.005 260);
+
+  --surface: oklch(0.20 0.014 260);
+  --surface-elevated: oklch(0.235 0.016 260);
+
+  --card: oklch(0.20 0.014 260);
+  --card-foreground: oklch(0.96 0.005 260);
+
+  --popover: oklch(0.22 0.015 260);
+  --popover-foreground: oklch(0.96 0.005 260);
+
+  --primary: oklch(0.72 0.18 155);
+  --primary-foreground: oklch(0.15 0.02 260);
+  --primary-glow: oklch(0.82 0.20 155);
+
+  --secondary: oklch(0.27 0.018 260);
+  --secondary-foreground: oklch(0.96 0.005 260);
+
+  --muted: oklch(0.25 0.015 260);
+  --muted-foreground: oklch(0.65 0.02 260);
+
+  --accent: oklch(0.30 0.04 200);
+  --accent-foreground: oklch(0.96 0.005 260);
+
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.98 0.005 260);
+
+  --success: oklch(0.72 0.18 155);
+  --success-foreground: oklch(0.15 0.02 260);
+
+  --border: oklch(0.28 0.015 260);
+  --input: oklch(0.28 0.015 260);
+  --ring: oklch(0.72 0.18 155);
+
+  --gradient-primary: linear-gradient(135deg, oklch(0.72 0.18 155), oklch(0.78 0.16 180));
+  --gradient-surface: linear-gradient(180deg, oklch(0.20 0.014 260), oklch(0.17 0.012 260));
+  --gradient-glow: radial-gradient(circle at 50% 0%, oklch(0.72 0.18 155 / 0.15), transparent 60%);
+
+  --shadow-elegant: 0 10px 40px -10px oklch(0 0 0 / 0.4);
+  --shadow-glow: 0 0 60px -10px oklch(0.72 0.18 155 / 0.3);
+
+  --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html, body, #root {
+    height: 100%;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer utilities {
+  .bg-gradient-primary { background-image: var(--gradient-primary); }
+  .bg-gradient-surface { background-image: var(--gradient-surface); }
+  .bg-gradient-glow { background-image: var(--gradient-glow); }
+  .shadow-elegant { box-shadow: var(--shadow-elegant); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .transition-smooth { transition: var(--transition-smooth); }
+
+  .scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted-foreground);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg,
+    transparent,
+    oklch(0.72 0.18 155 / 0.15),
+    transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.3; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+.animate-pulse-dot { animation: pulse-dot 1.4s ease-in-out infinite; }
