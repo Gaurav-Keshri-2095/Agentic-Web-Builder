@@ -29,10 +29,10 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Forge — AI Code Generation" },
+      { title: "AI WEB BUILDER" },
       { name: "description", content: "Generate full codebases from a single prompt with an AI agent pipeline." },
       { name: "author", content: "Forge" },
-      { property: "og:title", content: "Forge — AI Code Generation" },
+      { property: "og:title", content: "AI WEB BUILDER" },
       { property: "og:description", content: "Generate full codebases from a single prompt with an AI agent pipeline." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
