@@ -77,8 +77,9 @@ function Index() {
     try {
       const data = await generateProject(p, ctrl.signal);
       if (ctrl.signal.aborted) return;
-      setFiles(data.files);
-      setSelectedFile(data.files[0]?.path ?? "");
+      const generatedFiles = data.files ?? [];
+      setFiles(generatedFiles);
+      setSelectedFile(generatedFiles[0]?.path ?? "");
       setStatus("success");
     } catch (err) {
       if (ctrl.signal.aborted) return;
@@ -145,7 +146,7 @@ function Index() {
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-10">
         {status === "idle" && <InputPanel onSubmit={submit} disabled={false} />}
-        {status === "loading" && <LoadingState prompt={prompt} activeIdx={loadingStep} />}
+        {status === "loading" && <LoadingState prompt={prompt} />}
         {status === "error" && error && (
           <ErrorDisplay error={error} onRetry={() => submit(prompt)} onReset={reset} />
         )}

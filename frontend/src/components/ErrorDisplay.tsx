@@ -18,7 +18,7 @@ export function ErrorDisplay({ error, onRetry, onReset }: ErrorDisplayProps) {
         <h2 className="text-xl font-semibold text-red-400">{error.message}</h2>
       </div>
 
-      <p className="text-sm text-red-300 mb-4 break-words">{error.details}</p>
+      <p className="text-sm text-red-300 mb-4 wrap-break-word">{error.details}</p>
 
       {error.raw !== undefined && (
         <details className="text-xs text-gray-400">
