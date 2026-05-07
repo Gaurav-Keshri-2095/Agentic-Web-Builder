@@ -19,5 +19,5 @@ services: # defines container or service to be run
     ports:
       - "8080:8080"
     environment:
-      - VITE_API_BASE=http://localhost:8000 # this is the base url for the backend api,
+      - VITE_API_BASE=http://146.190.219.20:8000 # this is the base url for the backend api,
         # we will use this in frontend to make api calls to the backend
