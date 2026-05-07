@@ -7,7 +7,7 @@ services: # defines container or service to be run
     build: # build docker image using files inside the backend/ directory
       context: ./backend
     ports: # local port to container port mapping or requested port:container port
-      - "8000:8000"
+      - "8443:8000" # Cloudflare secure API port -> internal Python port
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
 
@@ -17,7 +17,7 @@ services: # defines container or service to be run
     build:
       context: ./frontend
     ports:
-      - "8080:8080"
+      - "80:8080"
     environment:
-      - VITE_API_BASE=http://146.190.219.20:8000 # this is the base url for the backend api,
+      - VITE_API_BASE=https://gauravkeshri.dev:8443 # this is the base url for the backend api,
         # we will use this in frontend to make api calls to the backend
