@@ -14,15 +14,11 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:8080",
-    ],
+    allow_origins=["*"], # allows all origins
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"], # allows all methods 
+    allow_headers=["*"], # allows all headers
 )
-
 
 def _error_body(error: str, details: str = "") -> dict:
     return {"success": False, "error": error, "details": details}
