@@ -206,5 +206,10 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# Modules
+# --- FRONTEND & FRAMEWORK SPECIFIC ---
 frontend/node_modules/
+frontend/dist/
+frontend/.wrangler/
+frontend/.tanstack/
+frontend/.vite/
+frontend/build/

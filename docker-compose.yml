@@ -1,0 +1,23 @@
+version: '3.8'
+
+services: # defines container or service to be run
+  backend: # name of the backend service
+    container_name: ai_web_builder-backend
+    image: ai_web_builder-backend-image
+    build: # build docker image using files inside the backend/ directory
+      context: ./backend
+    ports: # local port to container port mapping or requested port:container port
+      - "8000:8000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+
+  frontend:
+    container_name: ai_web_builder-frontend
+    image: ai_web_builder-frontend-image
+    build:
+      context: ./frontend
+    ports:
+      - "8080:8080"
+    environment:
+      - VITE_API_BASE=http://localhost:8000 # this is the base url for the backend api,
+        # we will use this in frontend to make api calls to the backend
