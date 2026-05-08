@@ -5,22 +5,22 @@ from langgraph.graph import StateGraph
 
 from agent.prompts import *
 from agent.states import *
-
+import os
 
 _ = load_dotenv()
 
-
+MODEL = os.getenv("MODEL")
 
 # llm = ChatGroq(model="llama-3.3-70b-versatile")
 
 # The Planner needs variance to brainstorm and structure the app.
-planner_llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.7)
+planner_llm = ChatGroq(model=MODEL, temperature=0.7)
 
 # The Architect needs to be grounded but still capable of translating concepts to structure.
-architect_llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.2)
+architect_llm = ChatGroq(model=MODEL, temperature=0.2)
 
 # The Coder must be entirely deterministic. Zero creativity. Pure syntax and logic.
-coder_llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.0)
+coder_llm = ChatGroq(model=MODEL, temperature=0.0)
 
 
 def _log(debug: bool, header: str, body: str) -> None:
