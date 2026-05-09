@@ -20,11 +20,13 @@ jobs:
           python-version: '3.10'
 
       - name: Run Backend Pytest
+        working-directory: ./backend
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
         run: |
-          cd backend
           pip install -r requirements.txt
           pip install -r requirements-dev.txt 
-          python -m pytest
+          pytest
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
