@@ -31,13 +31,13 @@ def _log(debug: bool, header: str, body: str) -> None:
 # llm = ChatGroq(model="qwen/qwen3-32b")
 
 
-def planner_agent(state: dict) -> dict:
+async def planner_agent(state: dict) -> dict:
     """Converts user prompt into a structured plan."""
     user_prompt = state["user_prompt"]
     debug = bool(state.get("debug"))
 
-    structured_llm = planner_llm.with_structured_output(Plan, method="json_mode")
-    resp: Plan = structured_llm.invoke([
+    structured_llm = planner_llm.with_structured_output(Plan)
+    resp: Plan = await structured_llm.ainvoke([
         {"role": "system", "content": planner_prompt(user_prompt)},
     ])
 
@@ -48,13 +48,13 @@ def planner_agent(state: dict) -> dict:
 
 
 
-def architect_agent(state: dict) -> dict:
+async def architect_agent(state: dict) -> dict:
     """Creates TaskPlan from Plan using structured output (no tool calls)."""
     plan: Plan = state["plan"]
     debug = bool(state.get("debug"))
 
-    structured_llm = architect_llm.with_structured_output(TaskPlan, method="json_mode")
-    resp: TaskPlan = structured_llm.invoke([
+    structured_llm = architect_llm.with_structured_output(TaskPlan)
+    resp: TaskPlan = await structured_llm.ainvoke([
         {"role": "system", "content": architect_prompt(plan=plan.model_dump_json())},
     ])
 
@@ -67,7 +67,7 @@ def architect_agent(state: dict) -> dict:
     return {**state, "task_plan": resp}
 
 
-def coder_agent(state: dict) -> dict:
+async def coder_agent(state: dict) -> dict:
     """LangGraph coder agent using structured output (CoderOutput)."""
     coder_state: CoderState = state.get("coder_state")
     debug = bool(state.get("debug"))
@@ -90,9 +90,9 @@ def coder_agent(state: dict) -> dict:
         f"Task Plan:\n{coder_state.task_plan.model_dump_json()}"
     )
 
-    structured_llm = coder_llm.with_structured_output(CoderOutput, method="json_mode")
+    structured_llm = coder_llm.with_structured_output(CoderOutput)
     try:
-        resp: CoderOutput = structured_llm.invoke(
+        resp: CoderOutput = await structured_llm.ainvoke(
             [
                 {"role": "system", "content": coder_system_prompt()},
                 {"role": "user", "content": user_prompt},
@@ -142,8 +142,8 @@ graph.set_entry_point("planner")
 agent = graph.compile()
 
 
-def generate_codebase(user_prompt: str) -> dict:
-    result = agent.invoke({"user_prompt": user_prompt, "debug": False}, {"recursion_limit": 100})
+async def generate_codebase(user_prompt: str) -> dict:
+    result = await agent.ainvoke({"user_prompt": user_prompt, "debug": False}, {"recursion_limit": 100})
     if "error" in result:
         return {
             "success": False,
@@ -158,8 +158,8 @@ def generate_codebase(user_prompt: str) -> dict:
     }
 
 
-def generate_codebase_debug(user_prompt: str, debug: bool = True) -> dict:
-    result = agent.invoke({"user_prompt": user_prompt, "debug": debug}, {"recursion_limit": 100})
+async def generate_codebase_debug(user_prompt: str, debug: bool = True) -> dict:
+    result = await agent.ainvoke({"user_prompt": user_prompt, "debug": debug}, {"recursion_limit": 100})
     if "error" in result:
         if debug:
             print("==== FINAL OUTPUT ====")

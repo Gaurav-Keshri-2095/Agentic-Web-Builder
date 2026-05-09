@@ -31,8 +31,8 @@ export function InputPanel({ onSubmit, disabled }: InputPanelProps) {
   };
 
   return (
-    <div className="relative w-full max-w-3xl mx-auto">
-      <div className="absolute inset-0 bg-gradient-glow pointer-events-none -z-10" />
+    <div className="relative w-full max-w-3xl mx-auto mt-8">
+      <div className="absolute -inset-x-32 -inset-y-32 bg-gradient-glow pointer-events-none -z-10 opacity-70" />
 
       <div className="text-center mb-10">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-elevated border text-xs text-muted-foreground mb-6">

@@ -27,7 +27,7 @@ def _error_body(error: str, details: str = "") -> dict:
 @app.post("/generate")
 async def generate(request: PromptRequest):
     try:
-        result = generate_codebase(request.prompt)
+        result = await generate_codebase(request.prompt)
 
         if not result.get("success"):
             return JSONResponse(

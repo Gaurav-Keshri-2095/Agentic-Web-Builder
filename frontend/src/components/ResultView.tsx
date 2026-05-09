@@ -62,9 +62,11 @@ export function ResultView({ files, activePath, prompt, onNew, onSelect }: Resul
   return (
     <div className="w-full h-[calc(100vh-5rem)] flex flex-col">
       <div className="flex items-start justify-between gap-4 mb-4 px-1">
-        <div className="min-w-0">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Prompt</p>
-          <p className="text-sm text-foreground line-clamp-2 max-w-3xl">{prompt}</p>
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 ml-1">Prompt</p>
+          <div className="text-sm text-foreground px-4 py-3 bg-muted/30 border rounded-xl max-w-4xl max-h-32 overflow-y-auto whitespace-pre-wrap word-break">
+            {prompt}
+          </div>
         </div>
         <div className="relative shrink-0 flex items-center gap-2">
           {viewMode === "code" && previewDoc !== null && (
