@@ -24,7 +24,8 @@ export function InputPanel({ onSubmit, disabled }: InputPanelProps) {
   };
 
   const handleKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
       handleSubmit();
     }
   };
@@ -60,8 +61,9 @@ export function InputPanel({ onSubmit, disabled }: InputPanelProps) {
           />
           <div className="flex items-center justify-between px-3 pb-3 pt-1">
             <span className="text-xs text-muted-foreground px-2">
-              <kbd className="px-1.5 py-0.5 rounded bg-muted text-[10px]">⌘</kbd>{" "}
-              <kbd className="px-1.5 py-0.5 rounded bg-muted text-[10px]">↵</kbd> to send
+              <kbd className="px-1.5 py-0.5 rounded bg-muted text-[10px]">↵</kbd> to send,{" "}
+              <kbd className="px-1.5 py-0.5 rounded bg-muted text-[10px]">⇧</kbd> +{" "}
+              <kbd className="px-1.5 py-0.5 rounded bg-muted text-[10px]">↵</kbd> for new line
             </span>
             <button
               type="submit"

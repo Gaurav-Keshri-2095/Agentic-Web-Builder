@@ -3,9 +3,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Code2 } from "lucide-react";
 import { InputPanel } from "@/components/InputPanel";
 import { LoadingState } from "@/components/LoadingState";
-import { ErrorDisplay } from "@/components/ErrorDisplay";
+import { GenerationError } from "@/components/GenerationError";
 import { ResultView } from "@/components/ResultView";
 import { generateProject, ApiError } from "@/lib/api";
+import { parseApiError, type NormalizedError } from "@/lib/utils";
 import type { GeneratedFile } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
@@ -14,12 +15,6 @@ export const Route = createFileRoute("/")({
 
 type Status = "idle" | "loading" | "success" | "error";
 type Step = { id: string; label: string; duration: number };
-
-type ErrorState = {
-  message: string;
-  details: string;
-  raw?: unknown;
-};
 
 const STEPS: Step[] = [
   { id: "plan", label: "Planning architecture", duration: 800 },
@@ -34,7 +29,7 @@ function Index() {
   const [files, setFiles] = useState<GeneratedFile[]>([]);
   const [selectedFile, setSelectedFile] = useState<string>("");
   const [loadingStep, setLoadingStep] = useState(0);
-  const [error, setError] = useState<ErrorState | null>(null);
+  const [error, setError] = useState<NormalizedError | null>(null);
   const inFlight = useRef<AbortController | null>(null);
   const timers = useRef<number[]>([]);
 
@@ -83,37 +78,7 @@ function Index() {
       setStatus("success");
     } catch (err) {
       if (ctrl.signal.aborted) return;
-      const fallback: ErrorState = {
-        message: "Generation failed",
-        details: "Unable to connect to server",
-      };
-
-      let parsed: ErrorState = fallback;
-
-      if (err instanceof ApiError) {
-        parsed = {
-          message: "Generation failed",
-          details: err.message || "Something went wrong",
-        };
-        try {
-          const asJson = JSON.parse(err.message);
-          const detail = (asJson as { detail?: unknown }).detail;
-          if (typeof detail === "string") {
-            parsed.details = detail.split("{")[0].trim() || "Invalid request";
-            parsed.raw = detail;
-          } else if (detail) {
-            parsed.details = "Invalid request";
-            parsed.raw = detail;
-          }
-        } catch {}
-      } else if (err instanceof Error) {
-        parsed = {
-          message: "Generation failed",
-          details: err.message || "Something went wrong",
-        };
-      }
-
-      setError(parsed);
+      setError(parseApiError(err));
       setStatus("error");
     }
   }, [status]);
@@ -148,7 +113,7 @@ function Index() {
         {status === "idle" && <InputPanel onSubmit={submit} disabled={false} />}
         {status === "loading" && <LoadingState prompt={prompt} />}
         {status === "error" && error && (
-          <ErrorDisplay error={error} onRetry={() => submit(prompt)} onReset={reset} />
+          <GenerationError error={error} onRetry={() => submit(prompt)} onReset={reset} />
         )}
         {status === "success" && files.length > 0 && (
           <ResultView

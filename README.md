@@ -39,10 +39,10 @@ The system follows a stateless, memory-efficient pattern. The entire generation 
 +-------------------+        +---------------------------------------------------------+
 |                   |        | Backend (FastAPI + LangGraph)                           |
 |   User Browser    |        |                                                         |
-|   (React/Vite)    |  POST  |  +---------+    +-----------+    +-------+    +-------+ |
-|                   +------->|  | API     |--->| Planner |--->|Architect|--->| Coder | |
-| - Enter prompt    |        |  | Router  |    | (Think)   |    | (Steps) |    | (Code)| |
-| - View Code       |        |  +---------+    +-----------+    +-----------+    +-------+ |
+|   (React/Vite)    |  POST  |  +---------+    +-----------+    +---------+    +-------+
+|                   +------->|  | API     |--->| Planner   |--->|Architect|--->| Coder |
+| - Enter prompt    |        |  | Router  |    | (Think)   |    | (Steps) |    | (Code)|
+| - View Code       |        |  +---------+    +-----------+    +---------+    +-------+
 | - Download .zip   |<-------+                 (Pydantic Structured Outputs)           |
 |                   | JSON   |                                                         |
 +-------------------+        +---------------------------------------------------------+
@@ -204,8 +204,9 @@ GROQ_API_KEY=gsk_your_groq_api_key
 ```
 
 **Run the Server:**
+/backend
 ```bash
-fastapi dev api.py
+uvicorn api:app --reload
 # Server runs on http://localhost:8000
 ```
 
