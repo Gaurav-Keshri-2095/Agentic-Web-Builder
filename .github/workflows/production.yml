@@ -24,7 +24,7 @@ jobs:
           cd backend
           pip install -r requirements.txt
           pip install -r requirements-dev.txt 
-          pytest
+          python -m pytest
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
