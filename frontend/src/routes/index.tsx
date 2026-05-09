@@ -93,8 +93,8 @@ function Index() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b bg-background/80 backdrop-blur sticky top-0 z-10">
+    <div className="h-screen overflow-hidden flex flex-col">
+      <header className="bg-background/80 backdrop-blur top-0 z-10 flex-none">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="h-7 w-7 rounded-lg bg-gradient-primary flex items-center justify-center">

@@ -213,3 +213,5 @@ frontend/.wrangler/
 frontend/.tanstack/
 frontend/.vite/
 frontend/build/
+
+backend/requirements-local-dev.txt

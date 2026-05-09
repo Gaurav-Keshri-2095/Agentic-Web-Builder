@@ -3,3 +3,8 @@ dist
 .git
 .tanstack
 .env
+
+src/test/
+**/*.test.ts
+**/*.test.tsx
+vitest.config.ts
