@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+langchain
+langchain-core
+langchain-groq
+langgraph
+python-dotenv
+pydantic
+httpx
+
+# testing libraries
+pytest
+pytest-asyncio
+pytest-mock
+pytest-mock
+pytest-asyncio

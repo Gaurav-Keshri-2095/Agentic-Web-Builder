@@ -6,4 +6,4 @@ venv/
 
 tests/
 .pytest_cache/
-requirements-local-dev.txt
+requirements-dev.txt
