@@ -36,7 +36,7 @@ async def planner_agent(state: dict) -> dict:
     user_prompt = state["user_prompt"]
     debug = bool(state.get("debug"))
 
-    structured_llm = planner_llm.with_structured_output(Plan)
+    structured_llm = planner_llm.with_structured_output(Plan, method="json_mode")
     resp: Plan = await structured_llm.ainvoke([
         {"role": "system", "content": planner_prompt(user_prompt)},
     ])
@@ -53,7 +53,7 @@ async def architect_agent(state: dict) -> dict:
     plan: Plan = state["plan"]
     debug = bool(state.get("debug"))
 
-    structured_llm = architect_llm.with_structured_output(TaskPlan)
+    structured_llm = architect_llm.with_structured_output(TaskPlan, method="json_mode")
     resp: TaskPlan = await structured_llm.ainvoke([
         {"role": "system", "content": architect_prompt(plan=plan.model_dump_json())},
     ])
@@ -90,7 +90,7 @@ async def coder_agent(state: dict) -> dict:
         f"Task Plan:\n{coder_state.task_plan.model_dump_json()}"
     )
 
-    structured_llm = coder_llm.with_structured_output(CoderOutput)
+    structured_llm = coder_llm.with_structured_output(CoderOutput, method="json_mode")
     try:
         resp: CoderOutput = await structured_llm.ainvoke(
             [

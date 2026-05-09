@@ -109,7 +109,7 @@ function Index() {
         </div>
       </header>
 
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-10">
+      <main className="flex-1 min-h-0 overflow-y-auto w-full max-w-7xl mx-auto px-4 sm:px-6 py-10">
         {status === "idle" && <InputPanel onSubmit={submit} disabled={false} />}
         {status === "loading" && <LoadingState prompt={prompt} />}
         {status === "error" && error && (
