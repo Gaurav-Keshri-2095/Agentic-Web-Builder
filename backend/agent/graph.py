@@ -14,7 +14,7 @@ MODEL = os.getenv("MODEL")
 # llm = ChatGroq(model="llama-3.3-70b-versatile")
 
 # The Planner needs variance to brainstorm and structure the app.
-planner_llm = ChatGroq(model=MODEL, temperature=0.7)
+planner_llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0.7)
 
 # The Architect needs to be grounded but still capable of translating concepts to structure.
 architect_llm = ChatGroq(model=MODEL, temperature=0.2)

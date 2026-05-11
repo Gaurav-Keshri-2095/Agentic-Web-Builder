@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Code2 } from "lucide-react";
+import { Code2, LogOut } from "lucide-react";
 import { InputPanel } from "@/components/InputPanel";
 import { LoadingState } from "@/components/LoadingState";
 import { GenerationError } from "@/components/GenerationError";
@@ -8,6 +8,9 @@ import { ResultView } from "@/components/ResultView";
 import { generateProject, ApiError } from "@/lib/api";
 import { parseApiError, type NormalizedError } from "@/lib/utils";
 import type { GeneratedFile } from "@/lib/types";
+import { useAuth } from "@/hooks/useAuth";
+import { AuthPage } from "@/components/auth/AuthPage";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -24,6 +27,7 @@ const STEPS: Step[] = [
 ];
 
 function Index() {
+  const { isAuthenticated, isLoading, login, logout } = useAuth();
   const [status, setStatus] = useState<Status>("idle");
   const [prompt, setPrompt] = useState("");
   const [files, setFiles] = useState<GeneratedFile[]>([]);
@@ -92,24 +96,34 @@ function Index() {
     setPrompt("");
   }, []);
 
+  if (isLoading) return null;
+
+  if (!isAuthenticated) return <AuthPage onLogin={login} />;
+
   return (
-    <div className="h-screen overflow-hidden flex flex-col">
-      <header className="bg-background/80 backdrop-blur top-0 z-10 flex-none">
+    <div className="min-h-screen flex flex-col bg-background">
+      <header className="bg-background/80 backdrop-blur top-0 border-b border-border/40 z-10 flex-none sticky">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-lg bg-gradient-primary flex items-center justify-center">
+            <div className="h-7 w-7 rounded-lg bg-gradient-primary flex items-center justify-center shadow-[0_0_15px_rgba(var(--primary),0.3)]">
               <Code2 className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="font-semibold tracking-tight">AI WEB BUILDER</span>
+            <span className="font-semibold tracking-tight text-foreground">AI WEB BUILDER</span>
           </div>
-          <div className="text-xs text-muted-foreground hidden sm:flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse-dot" />
-            Agent pipeline ready
+          <div className="flex items-center gap-4">
+            <div className="text-xs text-muted-foreground hidden sm:flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse-dot" />
+              Agent pipeline ready
+            </div>
+            <Button variant="ghost" size="sm" onClick={logout} className="h-8 group hover:bg-destructive/10 hover:text-destructive transition-colors">
+              <LogOut className="h-3.5 w-3.5 mr-2 group-hover:scale-110 transition-transform" />
+              Sign Out
+            </Button>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 min-h-0 overflow-y-auto w-full max-w-7xl mx-auto px-4 sm:px-6 py-10">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-10 flex flex-col">
         {status === "idle" && <InputPanel onSubmit={submit} disabled={false} />}
         {status === "loading" && <LoadingState prompt={prompt} />}
         {status === "error" && error && (

@@ -60,7 +60,7 @@ export function ResultView({ files, activePath, prompt, onNew, onSelect }: Resul
   const previewDoc = useMemo(() => buildPreviewDocument(files), [files]);
 
   return (
-    <div className="w-full h-[calc(100vh-5rem)] flex flex-col">
+    <div className="w-full flex-1 flex flex-col min-h-[75vh]">
       <div className="flex items-start justify-between gap-4 mb-4 px-1">
         <div className="min-w-0 flex-1">
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 ml-1">Prompt</p>
@@ -125,11 +125,11 @@ export function ResultView({ files, activePath, prompt, onNew, onSelect }: Resul
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-[260px_1fr] rounded-xl border bg-card shadow-elegant overflow-hidden">
-        <aside className="border-b md:border-b-0 md:border-r bg-surface min-h-0 max-h-[40vh] md:max-h-none">
+      <div className="flex-1 min-h-[600px] grid grid-cols-1 md:grid-cols-[260px_1fr] rounded-xl border bg-card shadow-elegant overflow-hidden">
+        <aside className="border-b md:border-b-0 md:border-r bg-surface min-h-0 md:max-h-none">
           <FileExplorer files={files} activePath={activePath} onSelect={onSelect} />
         </aside>
-        <main className="min-h-0 min-w-0 flex flex-col relative bg-zinc-950">
+        <main className="min-w-0 flex flex-col relative bg-zinc-950">
           {viewMode === "code" ? (
             <CodeViewer file={activeFile} />
           ) : (
