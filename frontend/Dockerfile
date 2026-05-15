@@ -15,9 +15,6 @@ RUN npm install -g wrangler
 # Copy the rest of the frontend code
 COPY . .
 
-# INJECT THE BUILD VARIABLE DIRECTLY
-ENV VITE_API_BASE=https://gauravkeshri.dev/api
-
 # Build the application
 RUN npm run build
 
