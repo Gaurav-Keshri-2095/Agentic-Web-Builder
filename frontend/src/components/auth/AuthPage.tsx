@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoginForm } from "./LoginForm";
 import { SignupForm } from "./SignupForm";
+import { ForgotPasswordForm } from "./ForgotPasswordForm";
 
 interface AuthPageProps {
   onLogin: () => void;
@@ -11,6 +12,7 @@ interface AuthPageProps {
 
 export function AuthPage({ onLogin }: AuthPageProps) {
   const [activeTab, setActiveTab] = useState("signin");
+  const [view, setView] = useState<"tabs" | "forgot-password">("tabs");
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background p-4 sm:p-6 dark">
@@ -30,24 +32,35 @@ export function AuthPage({ onLogin }: AuthPageProps) {
         </div>
 
         <Card className="border-border/50 bg-card/50 backdrop-blur-xl shadow-2xl">
-          <CardHeader className="pb-3 text-center">
-            <CardTitle>Welcome back</CardTitle>
-            <CardDescription className="text-xs">Sign in to your account</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-4 h-9">
-                <TabsTrigger value="signin" className="text-xs">Sign In</TabsTrigger>
-                <TabsTrigger value="signup" className="text-xs">Sign Up</TabsTrigger>
-              </TabsList>
-              <TabsContent value="signin" className="mt-0">
-                <LoginForm onSuccess={onLogin} />
-              </TabsContent>
-              <TabsContent value="signup" className="mt-0">
-                <SignupForm onSuccess={onLogin} switchToLogin={() => setActiveTab("signin")} />
-              </TabsContent>
-            </Tabs>
-          </CardContent>
+          {view === "tabs" ? (
+            <>
+              <CardHeader className="pb-3 text-center">
+                <CardTitle>Welcome back</CardTitle>
+                <CardDescription className="text-xs">Sign in to your account</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-4 h-9">
+                    <TabsTrigger value="signin" className="text-xs">Sign In</TabsTrigger>
+                    <TabsTrigger value="signup" className="text-xs">Sign Up</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="signin" className="mt-0">
+                    <LoginForm 
+                      onSuccess={onLogin} 
+                      onForgot={() => setView("forgot-password")}
+                    />
+                  </TabsContent>
+                  <TabsContent value="signup" className="mt-0">
+                    <SignupForm onSuccess={onLogin} switchToLogin={() => setActiveTab("signin")} />
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </>
+          ) : (
+            <CardContent className="pt-6">
+              <ForgotPasswordForm onBack={() => setView("tabs")} />
+            </CardContent>
+          )}
         </Card>
         
         <p className="text-center text-xs text-muted-foreground mt-6">

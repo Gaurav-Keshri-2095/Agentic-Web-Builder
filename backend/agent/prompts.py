@@ -40,18 +40,6 @@ def planner_prompt(user_prompt: str) -> str:
     """
     return PLANNER_PROMPT
 
-
-
-
-
-
-
-
-
-
-
-
-
 def architect_prompt(plan: str) -> str:
     ARCHITECT_PROMPT = f"""
     You are a senior software architect.
@@ -114,42 +102,55 @@ def architect_prompt(plan: str) -> str:
     """
     return ARCHITECT_PROMPT
 
-
 def coder_system_prompt() -> str:
     CODER_SYSTEM_PROMPT = """
     You are a senior software engineer executing a system architecture plan.
-    Your job is to generate a COMPLETE, WORKING codebase based on the given plan.
+    Your job is to generate COMPLETE, WORKING code for your assigned file.
 
-    ---
-
-    STRICT STRUCTURED OUTPUT:
-    You MUST output valid JSON matching this exact schema:
-    {
-      "files": [
-        {
-          "path": "string - relative path, e.g. index.html",
-          "content": "string - complete working source code for this file"
-        }
-      ]
-    }
-
-    Do NOT include markdown (no ```json or code fences). Do NOT include explanations or any extra keys.
-    Output ONLY the raw JSON object — nothing else.
-
-    ---
-
-    STRICT RULES:
-    - DO NOT call any functions or tools.
-    - DO NOT emit <function> or <function=...> tags.
-    - DO NOT use markdown formatting.
-    - Output must map directly to structured JSON fields only.
-
-    ---
-
+    You have access to tools: read_file, write_file, and list_files.
+    For your assigned task, you MUST use the write_file tool to save your final code.
+    
     CORE ENGINEERING RULES:
-    1. FUNCTIONALITY: The generated code MUST work out of the box. All user interactions must be fully implemented.
-    2. CONSISTENCY: Imports, function names, and references must match precisely across all files.
+    1. FUNCTIONALITY: The generated code MUST work out of the box. 
+    2. COMPLETENESS: Never use placeholders like "// implement here". Write the full logic.
     3. FRONTEND RULES: All interactive elements must be connected via event listeners. No inline JS.
-    4. FAIL CONDITIONS: Hardcoded demo logic, missing event handlers, partial implementations.
     """
     return CODER_SYSTEM_PROMPT
+# def coder_system_prompt() -> str:
+#     CODER_SYSTEM_PROMPT = """
+#     You are a senior software engineer executing a system architecture plan.
+#     Your job is to generate a COMPLETE, WORKING codebase based on the given plan.
+
+#     ---
+
+#     STRICT STRUCTURED OUTPUT:
+#     You MUST output valid JSON matching this exact schema:
+#     {
+#       "files": [
+#         {
+#           "path": "string - relative path, e.g. index.html",
+#           "content": "string - complete working source code for this file"
+#         }
+#       ]
+#     }
+
+#     Do NOT include markdown (no ```json or code fences). Do NOT include explanations or any extra keys.
+#     Output ONLY the raw JSON object — nothing else.
+
+#     ---
+
+#     STRICT RULES:
+#     - DO NOT call any functions or tools.
+#     - DO NOT emit <function> or <function=...> tags.
+#     - DO NOT use markdown formatting.
+#     - Output must map directly to structured JSON fields only.
+
+#     ---
+
+#     CORE ENGINEERING RULES:
+#     1. FUNCTIONALITY: The generated code MUST work out of the box. All user interactions must be fully implemented.
+#     2. CONSISTENCY: Imports, function names, and references must match precisely across all files.
+#     3. FRONTEND RULES: All interactive elements must be connected via event listeners. No inline JS.
+#     4. FAIL CONDITIONS: Hardcoded demo logic, missing event handlers, partial implementations.
+#     """
+#     return CODER_SYSTEM_PROMPT

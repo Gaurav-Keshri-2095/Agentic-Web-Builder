@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_groq.chat_models import ChatGroq
 from langgraph.constants import END
 from langgraph.graph import StateGraph
@@ -6,6 +7,9 @@ from langgraph.graph import StateGraph
 from agent.prompts import *
 from agent.states import *
 import os
+from langgraph.prebuilt import create_react_agent
+from langchain_core.messages import SystemMessage, HumanMessage
+from agent.tools import get_vfs, write_file, read_file, list_files, init_vfs
 
 _ = load_dotenv()
 
@@ -14,7 +18,7 @@ MODEL = os.getenv("MODEL")
 # llm = ChatGroq(model="llama-3.3-70b-versatile")
 
 # The Planner needs variance to brainstorm and structure the app.
-planner_llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0.7)
+planner_llm = ChatGroq(model=MODEL, temperature=0.7)
 
 # The Architect needs to be grounded but still capable of translating concepts to structure.
 architect_llm = ChatGroq(model=MODEL, temperature=0.2)
@@ -31,8 +35,25 @@ def _log(debug: bool, header: str, body: str) -> None:
 # llm = ChatGroq(model="qwen/qwen3-32b")
 
 
+# async def planner_agent(state: dict) -> dict:
+#     """Converts user prompt into a structured plan."""
+#     user_prompt = state["user_prompt"]
+#     debug = bool(state.get("debug"))
+
+#     structured_llm = planner_llm.with_structured_output(Plan, method="json_mode")
+#     resp: Plan = await structured_llm.ainvoke([
+#         {"role": "system", "content": planner_prompt(user_prompt)},
+#     ])
+
+#     if resp is None:
+#         raise ValueError("Planner didn't return a response.")
+#     _log(debug, "==== PLANNER OUTPUT ====", resp.model_dump_json())
+#     return {**state, "plan": resp}
+
 async def planner_agent(state: dict) -> dict:
     """Converts user prompt into a structured plan."""
+    init_vfs() # CRITICAL: Reset the memory file system for a fresh run
+    
     user_prompt = state["user_prompt"]
     debug = bool(state.get("debug"))
 
@@ -45,7 +66,6 @@ async def planner_agent(state: dict) -> dict:
         raise ValueError("Planner didn't return a response.")
     _log(debug, "==== PLANNER OUTPUT ====", resp.model_dump_json())
     return {**state, "plan": resp}
-
 
 
 async def architect_agent(state: dict) -> dict:
@@ -67,8 +87,65 @@ async def architect_agent(state: dict) -> dict:
     return {**state, "task_plan": resp}
 
 
+# async def coder_agent(state: dict) -> dict:
+#     """LangGraph coder agent using structured output (CoderOutput)."""
+#     coder_state: CoderState = state.get("coder_state")
+#     debug = bool(state.get("debug"))
+
+#     if coder_state is None:
+#         coder_state = CoderState(task_plan=state["task_plan"], current_step_idx=0)
+
+#     steps = coder_state.task_plan.implementation_steps
+#     if coder_state.current_step_idx >= len(steps):
+#         return {**state, "coder_state": coder_state, "status": "DONE"}
+
+#     if debug:
+#         print("==== CODER STEP 1 ====")
+#         print("File: (full codebase)")
+#         print("Task: Generate complete codebase JSON")
+
+#     plan: Plan = state["plan"]
+#     user_prompt = (
+#         f"Plan:\n{plan.model_dump_json()}\n\n"
+#         f"Task Plan:\n{coder_state.task_plan.model_dump_json()}"
+#     )
+
+#     structured_llm = coder_llm.with_structured_output(CoderOutput, method="json_mode")
+#     try:
+#         resp: CoderOutput = await structured_llm.ainvoke(
+#             [
+#                 {"role": "system", "content": coder_system_prompt()},
+#                 {"role": "user", "content": user_prompt},
+#             ]
+#         )
+#         if resp is None:
+#             raise ValueError("Coder didn't return a response.")
+
+#         files = [f.model_dump() for f in resp.files]
+#         if not files:
+#             raise ValueError("No files generated")
+
+#         coder_state.generated_files = files
+#         coder_state.current_step_idx = len(coder_state.task_plan.implementation_steps)
+
+#         _log(debug, "==== CODER OUTPUT ====", resp.model_dump_json())
+#         return {**state, "coder_state": coder_state, "status": "DONE"}
+#     except Exception as e:
+#         print("==== CODER FAILURE ====")
+#         print(str(e))
+#         return {
+#             **state,
+#             "coder_state": coder_state,
+#             "status": "DONE",
+#             "error": {
+#                 "error": "Code generation failed",
+#                 "details": str(e),
+#             },
+#         }
+
+
 async def coder_agent(state: dict) -> dict:
-    """LangGraph coder agent using structured output (CoderOutput)."""
+    """LangGraph tool-using coder agent."""
     coder_state: CoderState = state.get("coder_state")
     debug = bool(state.get("debug"))
 
@@ -76,52 +153,51 @@ async def coder_agent(state: dict) -> dict:
         coder_state = CoderState(task_plan=state["task_plan"], current_step_idx=0)
 
     steps = coder_state.task_plan.implementation_steps
+    
+    # 1. Check if we are done with all steps
     if coder_state.current_step_idx >= len(steps):
+        # Package the memory VFS into the format your frontend expects
+        files = [{"path": p, "content": c} for p, c in get_vfs().items()]
+        coder_state.generated_files = files
         return {**state, "coder_state": coder_state, "status": "DONE"}
 
+    # 2. Setup the current task
+    current_task = steps[coder_state.current_step_idx]
+    
     if debug:
-        print("==== CODER STEP 1 ====")
-        print("File: (full codebase)")
-        print("Task: Generate complete codebase JSON")
+        print(f"==== CODER STEP {coder_state.current_step_idx + 1}/{len(steps)} ====")
+        print(f"Task: {current_task.filepath}")
 
-    plan: Plan = state["plan"]
+    existing_content = get_vfs().get(current_task.filepath, "")
+
+    system_prompt = coder_system_prompt()
     user_prompt = (
-        f"Plan:\n{plan.model_dump_json()}\n\n"
-        f"Task Plan:\n{coder_state.task_plan.model_dump_json()}"
+        f"Task: {current_task.task_description}\n"
+        f"File: {current_task.filepath}\n"
+        f"Existing content:\n{existing_content}\n\n"
+        "Execute the task. You MUST use the write_file tool to save your final output."
     )
 
-    structured_llm = coder_llm.with_structured_output(CoderOutput, method="json_mode")
+    coder_tools = [read_file, write_file, list_files]
+    
+    # 3. Use LangGraph's native prebuilt agent
+    react_agent = create_react_agent(coder_llm, tools=coder_tools)
+
     try:
-        resp: CoderOutput = await structured_llm.ainvoke(
-            [
-                {"role": "system", "content": coder_system_prompt()},
-                {"role": "user", "content": user_prompt},
-            ]
-        )
-        if resp is None:
-            raise ValueError("Coder didn't return a response.")
-
-        files = [f.model_dump() for f in resp.files]
-        if not files:
-            raise ValueError("No files generated")
-
-        coder_state.generated_files = files
-        coder_state.current_step_idx = len(coder_state.task_plan.implementation_steps)
-
-        _log(debug, "==== CODER OUTPUT ====", resp.model_dump_json())
-        return {**state, "coder_state": coder_state, "status": "DONE"}
+        # Await the ainvoke with proper LangChain message objects
+        result = await react_agent.ainvoke({
+        "messages": [
+            SystemMessage(content=system_prompt),
+            HumanMessage(content=user_prompt)
+        ]
+    })
+        print(f"[CODER] Step {coder_state.current_step_idx+1} done. VFS keys: {list(get_vfs().keys())}")
     except Exception as e:
-        print("==== CODER FAILURE ====")
-        print(str(e))
-        return {
-            **state,
-            "coder_state": coder_state,
-            "status": "DONE",
-            "error": {
-                "error": "Code generation failed",
-                "details": str(e),
-            },
-        }
+        if debug:
+            print(f"==== CODER STEP FAILED: {str(e)} ====")
+        
+    coder_state.current_step_idx += 1
+    return {**state, "coder_state": coder_state, "status": "CONTINUE"}
 
 graph = StateGraph(dict)
 

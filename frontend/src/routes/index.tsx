@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Code2, LogOut } from "lucide-react";
 import { InputPanel } from "@/components/InputPanel";
@@ -27,7 +27,8 @@ const STEPS: Step[] = [
 ];
 
 function Index() {
-  const { isAuthenticated, isLoading, login, logout } = useAuth();
+  const { isAuthenticated, isRecoveryMode, isLoading, logout } = useAuth();
+  const navigate = useNavigate();
   const [status, setStatus] = useState<Status>("idle");
   const [prompt, setPrompt] = useState("");
   const [files, setFiles] = useState<GeneratedFile[]>([]);
@@ -59,6 +60,12 @@ function Index() {
       timers.current = [];
     };
   }, [status]);
+
+  useEffect(() => {
+    if (isRecoveryMode) {
+      navigate({ to: "/reset-password", replace: true });
+    }
+  }, [isRecoveryMode, navigate]);
 
   const submit = useCallback(async (p: string) => {
     if (status === "loading") return; // prevent duplicates
@@ -98,7 +105,9 @@ function Index() {
 
   if (isLoading) return null;
 
-  if (!isAuthenticated) return <AuthPage onLogin={login} />;
+  if (isRecoveryMode) return null;
+
+  if (!isAuthenticated) return <AuthPage onLogin={() => {}} />;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

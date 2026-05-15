@@ -1,21 +1,26 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from agent.graph import generate_codebase
 
 
 class PromptRequest(BaseModel):
-    prompt: str
-
+    # user_prompt: str
+    user_prompt: str = Field(..., alias="prompt")  # accepts "prompt" from frontend
+    
+    model_config = {"populate_by_name": True}
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # allows all origins
-    allow_credentials=False,
+    allow_origins=[
+        "https://aiwebbuilder.gauravkeshri.dev", 
+        "http://localhost:5173" # Keep your local dev environment
+    ],
+    allow_credentials=True,
     allow_methods=["*"], # allows all methods 
     allow_headers=["*"], # allows all headers
 )
@@ -27,7 +32,7 @@ def _error_body(error: str, details: str = "") -> dict:
 @app.post("/generate")
 async def generate(request: PromptRequest):
     try:
-        result = await generate_codebase(request.prompt)
+        result = await generate_codebase(request.user_prompt)
 
         if not result.get("success"):
             return JSONResponse(
